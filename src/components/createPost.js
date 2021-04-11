@@ -11,7 +11,7 @@ function CreatePost({ onNewPostUpdate }) {
   let handleSubmitForm = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:8003/post", {
+      .post("http://localhost:4001/post", {
         title,
         headers: {},
       })
@@ -19,7 +19,8 @@ function CreatePost({ onNewPostUpdate }) {
         setTitle("");
         onNewPostUpdate(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setTitle(""));
   };
 
   return (
@@ -27,7 +28,7 @@ function CreatePost({ onNewPostUpdate }) {
       <div>
         <form onSubmit={handleSubmitForm}>
           <div>Create Post</div>
-          <input onChange={handlePost} placeholder="Post"></input>
+          <input value={title} onChange={handlePost} placeholder="Post"></input>
           <button type="submit">Submit</button>
         </form>
       </div>

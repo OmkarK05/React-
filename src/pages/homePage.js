@@ -3,10 +3,9 @@ import React, { useEffect, useState } from "react";
 import CreatePost from "../components/createPost";
 
 function HomePage() {
-  let [posts, setPosts] = useState([]);
+  let [posts, setPosts] = useState({});
   let [comment, setComment] = useState("");
   let [postId, setPostId] = useState(null);
-  let [comments, setComments] = useState({});
 
   useEffect(() => {
     getAllPosts();
@@ -14,25 +13,19 @@ function HomePage() {
 
   const getAllPosts = () => {
     axios
-      .get("http://localhost:8003/posts")
-      .then((res) => {
-        setPosts(res.data ? [...res.data] : []);
-        console.log(res);
-      })
-      .catch((err) => console.log(err));
-
-    axios
-      .get("http://localhost:4001/comments")
+      .get("http://localhost:4004/events")
       .then((res) => {
         console.log(res);
-        setComments(res.data.comments ? res.data.comments : {});
+        setPosts(res.data ? { ...res.data } : {});
       })
       .catch((err) => console.log(err));
   };
 
   let handleNewPostUpdate = (post) => {
     console.log(post);
-    setPosts([...posts, post]);
+    let newPosts = { ...posts };
+    newPosts[post["id"]] = post;
+    setPosts(newPosts);
   };
 
   let handleComment = (e) => {
@@ -42,44 +35,48 @@ function HomePage() {
   let handleSubmitComment = (e) => {
     e.preventDefault();
     axios
-      .post(`http://localhost:4001/posts/${postId}/comment`, {
+      .post(`http://localhost:4002/posts/${postId}/comment`, {
         content: comment,
       })
       .then((res) => {
-        let comment = res.data.comment;
-        comments[postId] = comments[postId] || [];
-        comments[postId] = [...comments[postId], comment];
-        // setComments({ ...comments, postId: [...comments[postId], comment] });
-        setComments({ ...comments });
-        console.log(comments);
+        let updatedComment = res.data.comment;
+        let postId = res.data.postId;
+        let post = posts[postId];
+        post["comments"] = post["comments"] || [];
+        post.comments.push(updatedComment);
+        setPosts({ ...posts });
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setComment(""));
   };
 
   return (
     <div>
       <CreatePost onNewPostUpdate={handleNewPostUpdate}></CreatePost>
       <div className="posts-container">
-        {posts.length > 0 &&
-          posts.map((post, i) => (
-            <div className="card" key={post.id}>
+        <h3>Posts</h3>
+        {posts !== {} &&
+          Object.entries(posts).map(([key, value]) => (
+            <div className="card" key={key}>
               <div>
-                <p>{post.title}</p>
+                <p>{value.title}</p>
               </div>
               <div>
                 <p>Comments</p>
                 <ul>
-                  {comments[post["id"]] &&
-                    comments[post["id"]].map((comment, i) => (
+                  {value["comments"] &&
+                    value["comments"].length > 0 &&
+                    value["comments"].map((comment, i) => (
                       <li key={Comment["id"]}>{comment["content"]}</li>
                     ))}
                 </ul>
                 <form onSubmit={handleSubmitComment}>
                   <input
+                    value={comment}
                     onChange={handleComment}
                     placeholder="Add Comment"
                   ></input>
-                  <button type="submit" onClick={() => setPostId(post["id"])}>
+                  <button type="submit" onClick={() => setPostId(key)}>
                     Submit
                   </button>
                 </form>
