@@ -11,7 +11,7 @@ function CreatePost({ onNewPostUpdate }) {
   let handleSubmitForm = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:4001/post", {
+      .post("http://posts.com/post/create", {
         title,
         headers: {},
       })

@@ -13,7 +13,7 @@ function HomePage() {
 
   const getAllPosts = () => {
     axios
-      .get("http://localhost:4004/events")
+      .get("http://posts.com/events")
       .then((res) => {
         console.log(res);
         setPosts(res.data ? { ...res.data } : {});
@@ -35,7 +35,7 @@ function HomePage() {
   let handleSubmitComment = (e) => {
     e.preventDefault();
     axios
-      .post(`http://localhost:4002/posts/${postId}/comment`, {
+      .post(`http://posts.com/posts/${postId}/comment`, {
         content: comment,
       })
       .then((res) => {

@@ -1,7 +1,7 @@
 import React from "react";
 import HomePage from "./pages/homePage";
 
-let app = () => {
+let App = () => {
   return (
     <div>
       <HomePage></HomePage>
@@ -9,4 +9,4 @@ let app = () => {
   );
 };
 
-export default app;
+export default App;
